@@ -353,6 +353,7 @@
               "fieldConfig": {
                 "defaults": {
                   "decimals": 2,
+                  "unit": "prefix:$",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -362,7 +363,7 @@
                       },
                       {
                         "value": 80,
-                        "color": "red"
+                        "color": "green"
                       }
                     ]
                   },
