@@ -11,6 +11,6 @@ class Usuario(db.Model):
     gastos = db.relationship("Gasto", backref="usuario", lazy=True)
     LinkDashboard = db.Column(db.String(255), nullable=True)
 
-__table_args__ = (
-    db.UniqueConstraint('IdChat', name='uq_usuario_chat'),
-)
+    __table_args__ = (
+        db.UniqueConstraint('IdChat', name='uq_usuario_chat'),
+    )

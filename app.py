@@ -4,6 +4,14 @@ from database import db
 import requests
 import os
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+from Model import Usuario, Categoria, Gasto
+
+TZ = ZoneInfo("America/Argentina/Buenos_Aires")
+
+def now():
+    return datetime.now(TZ)
+
 
 load_dotenv()
 
@@ -19,8 +27,6 @@ GRAFANA_URL = os.getenv("GRAFANA_URL")
 GRAFANA_DASHBOARD_ID = os.getenv("GRAFANA_DASHBOARD_ID") 
 
 db.init_app(app)
-
-from Model import Usuario, Categoria, Gasto
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_API = f"https://api.telegram.org/bot{TOKEN}"
@@ -74,7 +80,7 @@ def nuevoGasto(usuario, chat_id, args):
     
     categoria = getOrCreateCategoria(categoria_nombre, usuario.Id)
 
-    hace_un_minuto = datetime.utcnow() - timedelta(minutes=1)
+    hace_un_minuto = now() - timedelta(minutes=1)
     
     existe = Gasto.query.filter(db.func.abs(db.cast(Gasto.Monto, db.Float) - monto) < 0.001,
     Gasto.IdUsuario == usuario.Id, Gasto.IdCategoria == categoria.Id,Gasto.Fecha >= hace_un_minuto).first()
@@ -171,8 +177,8 @@ def categorias(usuario, chat_id):
 from datetime import datetime
 
 def resumen(usuario, chat_id):
-    hoy = datetime.utcnow()
-    inicio_mes = datetime(hoy.year, hoy.month, 1)
+    hoy = now()
+    inicio_mes = datetime(hoy.year, hoy.month, 1, tzinfo=TZ)
 
     resultados = (
         db.session.query(
@@ -205,7 +211,7 @@ def resumen(usuario, chat_id):
     enviarMensaje(chat_id, texto)
 
 def baja(usuario, chat_id):
-    usuario.FechaBaja = datetime.utcnow()
+    usuario.FechaBaja = now()
     db.session.commit()
     enviarMensaje(chat_id, "Lamentamos que te vayas 😢. Si cambias de opinión, siempre podés volver a escribir /start")
 
