@@ -249,7 +249,7 @@ def webhook():
         "Desde acá podés registrar tus gastos fácilmente:\n\n"
         "/gasto 100.50 comida — registrar un gasto\n"
         "/gastos — ver tus últimos gastos\n"
-        "/eliminar ID — eliminar un gasto por ID (ej: /eliminar 5)\n"
+        "/eliminar Numero — eliminar un gasto por Numero (ej: /eliminar 5)\n"
         "/eliminar YYYY-MM-DD — eliminar gastos por fecha (ej: /eliminar 2026-04-29)\n"
         "/categorias — ver tus categorías\n\n"
         "/midashboard — ver un dashboard con tus gastos\n\n"
