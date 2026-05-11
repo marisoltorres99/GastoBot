@@ -55,7 +55,7 @@ def vencimientos(usuario, chat_id):
 
     for v in lista:
 
-        dias_restantes = (v.FechaVencimiento.date() - hoy).days
+        dias_restantes = (v.FechaVencimiento - hoy).days
 
         if dias_restantes == 0:
             estado = "🔴 Vence hoy"
