@@ -6,6 +6,9 @@ from config import Config
 from routes.webhook_routes import webhook_bp
 from routes.health_routes import health_bp
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from jobs.recordatorio_job import verificar_vencimientos
+
 app = Flask(__name__)
 
 app.config.from_object(Config)
@@ -16,6 +19,10 @@ with app.app_context():
 
 app.register_blueprint(webhook_bp)
 app.register_blueprint(health_bp)
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(verificar_vencimientos, "interval", hours=1)
+scheduler.start()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
