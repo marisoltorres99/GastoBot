@@ -5,7 +5,7 @@ import requests
 import os
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-from Model import Usuario, Categoria, Gasto
+from Model import Usuario, Categoria, Gasto, Vencimiento
 
 TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 
@@ -221,6 +221,38 @@ def generarLinkDashboard(usuario):
     db.session.commit()
     return link
 
+def nuevoVencimiento(usuario, chat_id, args):
+    try:
+        partes = args.split(" ", 1)
+        vencimiento_nombre = partes[0].strip().lower()
+        fecha = datetime.strptime(partes[1], "%Y-%m-%d")
+    except (ValueError, IndexError):
+        enviarMensaje(chat_id, "🚫 Formato incorrecto. Usá: /vencimiento luz 2026-05-20")
+        return
+    
+    if fecha.date() < now().date():
+        enviarMensaje(chat_id, "🚫 Debés ingresar una fecha posterior al día de hoy.")
+        return
+
+    if not vencimiento_nombre:
+        enviarMensaje(chat_id, "🚫 Debés indicar un vencimiento")
+        return
+    
+    existe = Vencimiento.query.filter_by(
+        Nombre=vencimiento_nombre,
+        IdUsuario=usuario.Id
+        ).first()
+    
+    if existe:
+        enviarMensaje(chat_id, 
+        "✋ Ya registraste un vencimiento con ese nombre")
+        return
+
+    vencimiento = Vencimiento(Nombre=vencimiento_nombre, FechaVencimiento=fecha, IdUsuario=usuario.Id)
+    db.session.add(vencimiento)
+    db.session.commit()
+    enviarMensaje(chat_id, f"✅ Vencimiento de {vencimiento_nombre} en '{fecha.strftime("%Y-%m-%d")}' registrado.")
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.json
@@ -245,17 +277,29 @@ def webhook():
         generarLinkDashboard(usuario)
         enviarMensaje(chat_id, 
         f"¡Hola {nombre}! 👋\n\n"
+
         "Bienvenido a MisGastos, tu asistente personal de finanzas 💸\n\n"
+
         "En este chat podés registrar tus gastos fácilmente y después llevar control de ellos. \n\n"
+
         "Tenés disponible las siguientes funciones:\n\n"
+
         "/gasto 100.50 comida — Registrar un gasto\n"
         "/gastos — Ver tus últimos gastos\n"
         "/eliminar ID — Eliminar un gasto específico del registro (ej: /eliminar 5)\n"
         "/eliminar YYYY-MM-DD — Eliminar todos los gastos de una fecha particula (ej: /eliminar 2026-04-29)\n"
         "/categorias — Ver tus categorías de gastos\n\n"
+
         "/midashboard — Ver un dashboard con tus gastos\n\n"
-        "/resumen — Ver el resumen mensual por categoría 📊\n"
+
+        "/resumen — Ver el resumen mensual por categoría 📊\n\n"
+
+        "/vencimiento luz 2026-05-20 — Registrar un vencimiento 📅\n"
+        "/vencimientos — Ver tus vencimientos registrados\n"
+        "/eliminarvencimiento ID — Eliminar un vencimiento específico\n\n"
+
         "/baja — Para dejar de usar el bot\n\n"
+
         "Las categorías se crean automáticamente cuando registrás tus gastos!\n"
         "Para poder agrupar los gastos en una misma categoría, recordá escribirla siempre de la misma manera✅\n\n"
         "¿Todo listo? ¡Empecemos a ordenar tus finanzas! 🚀"
@@ -274,6 +318,9 @@ def webhook():
         resumen(usuario, chat_id)
     elif texto.startswith("/baja"):
         baja(usuario, chat_id)
+    elif texto.startswith("/vencimiento "):
+        args = texto[len("/vencimiento "):].strip()
+        nuevoVencimiento(usuario, chat_id, args)
     elif texto.startswith("/midashboard"):
         if not usuario.LinkDashboard:
             generarLinkDashboard(usuario)
@@ -297,3 +344,7 @@ if __name__ == "__main__":
 # - Validar montos y duplicados -- OK
 # - Validar que no se repitan categorias para 1 mismo usuario o que no sean similares o con nombres vacios --OK
 # - Agregar comando /eliminar para eliminar un gasto por ID o fecha --OK
+
+# - Agregar comando /vencimientos para listar vencimientos -- Pendiente
+# - Agregar comando /eliminarvencimiento -- Pendiente
+# - Agregar alertas automáticas de vencimientos
