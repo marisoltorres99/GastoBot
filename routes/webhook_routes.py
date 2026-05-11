@@ -7,7 +7,7 @@ from services.usuario_service import getOrCreateUsuario, baja
 from services.dashboard_service import generarLinkDashboard
 from services.gasto_service import nuevoGasto, gastos, eliminarGasto, resumen
 from services.categoria_service import categorias
-from services.vencimiento_service import nuevoVencimiento
+from services.vencimiento_service import nuevoVencimiento, vencimientos, eliminarVencimiento
 
 webhook_bp = Blueprint("webhook", __name__)
 
@@ -79,6 +79,11 @@ def webhook():
     elif texto.startswith("/vencimiento "):
         args = texto[len("/vencimiento "):].strip()
         nuevoVencimiento(usuario, chat_id, args)
+    elif texto.startswith("/vencimientos"):
+        vencimientos(usuario, chat_id)
+    elif texto.startswith("/eliminarvencimiento"):
+        args = texto[len("/eliminarvencimiento"):].strip()
+        eliminarVencimiento(usuario, chat_id, args)
     elif texto.startswith("/midashboard"):
         if not usuario.LinkDashboard:
             generarLinkDashboard(usuario)
