@@ -35,3 +35,40 @@ def nuevoVencimiento(usuario, chat_id, args):
     db.session.add(vencimiento)
     db.session.commit()
     enviarMensaje(chat_id, f"✅ Vencimiento de {vencimiento_nombre} en '{fecha.strftime("%Y-%m-%d")}' registrado.")
+
+def vencimientos(usuario, chat_id):
+
+    lista = (
+        Vencimiento.query
+        .filter_by(IdUsuario=usuario.Id)
+        .order_by(Vencimiento.FechaVencimiento.asc())
+        .all()
+    )
+
+    if not lista:
+        enviarMensaje(chat_id, "📅 No tenés vencimientos registrados")
+        return
+
+    texto = "📅 Tus vencimientos:\n\n"
+
+    hoy = now().date()
+
+    for v in lista:
+
+        dias_restantes = (v.FechaVencimiento.date() - hoy).days
+
+        if dias_restantes == 0:
+            estado = "🔴 Vence hoy"
+        elif dias_restantes <= 3:
+            estado = f"🟡 Vence en {dias_restantes} días"
+        else:
+            estado = f"🟢 Faltan {dias_restantes} días"
+
+        texto += (
+            f"• #{v.Id} | "
+            f"{v.Nombre} — "
+            f"{v.FechaVencimiento.strftime('%Y-%m-%d')} "
+            f"({estado})\n"
+        )
+
+    enviarMensaje(chat_id, texto)
