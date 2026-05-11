@@ -1,12 +1,5 @@
 from database import db
-from datetime import datetime
-from datetime import datetime
-from zoneinfo import ZoneInfo
-
-TZ = ZoneInfo("America/Argentina/Buenos_Aires")
-
-def now():
-    return datetime.now(TZ)
+from utils.datetime_utils import now
 
 class Gasto(db.Model):
     __tablename__ = "Gastos"
