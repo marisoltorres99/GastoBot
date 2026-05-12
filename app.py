@@ -41,6 +41,6 @@ if __name__ == "__main__":
 # - Validar que no se repitan categorias para 1 mismo usuario o que no sean similares o con nombres vacios --OK
 # - Agregar comando /eliminar para eliminar un gasto por ID o fecha --OK
 
-# - Agregar comando /vencimientos para listar vencimientos -- Pendiente
-# - Agregar comando /eliminarvencimiento -- Pendiente
-# - Agregar alertas automáticas de vencimientos
+# - Agregar comando /vencimientos para listar vencimientos -- OK
+# - Agregar comando /eliminarvencimiento -- OK
+# - Agregar alertas automáticas de vencimientos -- OK
