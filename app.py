@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_migrate import Migrate
 
 from database import db
 from config import Config
@@ -14,8 +15,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
-with app.app_context():
-    db.create_all()
+migrate = Migrate(app, db)
 
 app.register_blueprint(webhook_bp)
 app.register_blueprint(health_bp)
